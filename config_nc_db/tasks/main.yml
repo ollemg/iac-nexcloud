@@ -1,0 +1,41 @@
+---
+- name: Instala ferramentas administrativas
+  apt:
+    name: "{{ admin_packages }}"
+
+- name: Instala Database
+  apt:
+    name: "{{ db_packages }}"
+
+- name: Remove arquivo my.cnf que vem por padrao
+  community.general.archive:
+    path: /etc/mysql/my.cnf
+    remove: true
+
+- name: Arquivo de configuração do Mysql
+  template:
+    src: mysql.j2
+    dest: /etc/alternatives/my.cnf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reinicia o Serviço do MySQL
+  service:
+    name: mysql
+    state: restarted
+
+- name: Ativa o Serviço do MySQL
+  service:
+    name: mysql
+    enabled: true
+
+
+- name: Cria o usuario {{ db_username }}
+  command: mysql -e "CREATE USER '{{ db_username }}'@'%' IDENTIFIED BY '{{ db_password }}';"
+
+- name: Cria a database {{ db_name }}
+  command: mysql -e "CREATE DATABASE IF NOT EXISTS {{ db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+
+- name: Concede as permissões do usuário
+  command: mysql -e "GRANT ALL PRIVILEGES on *.* to '{{ db_username }}'@'%';"

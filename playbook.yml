@@ -1,0 +1,17 @@
+---
+# - hosts: db
+#   pre_tasks:
+#     - name: Atualiza repositorio
+#       apt:
+#         update_cache: true
+#   roles:
+#     - config_nc_db
+
+- hosts: web
+  pre_tasks:
+    - name: Atualiza repositorio
+      apt:
+        update_cache: true
+
+  roles:
+    - config_nc_web
