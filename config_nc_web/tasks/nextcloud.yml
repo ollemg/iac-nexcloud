@@ -64,6 +64,14 @@
         line: "    0 => '{{ domain }}',"
       tags: config-nextcloud-domain2
 
+    - name: Template do arquivo .htaccess
+      template:
+        src: htaccess.j2
+        dest: "{{ work_dir }}"
+        owner: www-data
+        group: www-data
+        mode: '0744'
+
     - name: Reinicia o Serviço do apache2
       service:
         name: apache2

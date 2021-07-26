@@ -1,12 +1,12 @@
 # ANSIBLE CONF
 <VirtualHost *:80>
-  ServerName  {{ domain }}
-  Redirect / https://{{ domain }}/
+  ServerName {{ domain }}
+  Redirect permanent / https://{{ domain }}/
 
 </VirtualHost>
 <VirtualHost *:443>
 
-  ServerName{{ domain }}
+  ServerName {{ domain }}
   DocumentRoot {{ work_dir }}
 
   <Directory {{ work_dir }}>
@@ -17,10 +17,13 @@
     <IfModule mod_dav.c>
       Dav off
     </IfModule>
-
   </Directory>
+    
+    <IfModule mod_headers.c>
+      Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
+    </IfModule>
 
    SSLEngine on
    SSLCertificateFile {{ ssl_dir }}{{ ssl_crt }}
-   SSLCertificateKeyFile {{ ssl_dir }}{{ ssl_dir }}
+   SSLCertificateKeyFile {{ ssl_dir }}{{ ssl_key }}
 </VirtualHost>

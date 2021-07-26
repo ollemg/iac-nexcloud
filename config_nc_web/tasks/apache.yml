@@ -22,7 +22,7 @@
       when: apache_conf.stat.exists
 
     - name: Ativa o modulo ssl rewrite
-      command: /usr/sbin/a2enmod ssl rewrite
+      command: /usr/sbin/a2enmod ssl rewrite headers
       when: apache_conf.stat.exists
 
     - name: Copia o certificado SSL
