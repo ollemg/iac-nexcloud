@@ -3,69 +3,136 @@
   apt:
     name: "{{ admin_packages }}"
 
-- name: Adiciona a GPG Key do Repositorio PHP 7.4
-  get_url:
-    url: 'https://packages.sury.org/php/apt.gpg'
-    dest: '/etc/apt/trusted.gpg.d/php.gpg'
+- name: Instalação e configuração do PHP 7.4
+  block:
 
-- name: Adiciona repositorio do PHP 7.4
-  apt_repository:
-    repo: deb https://packages.sury.org/php/ "{{ debian_version }}" main
-    state: present
-    filename: php
-    update_cache: true
+    - name: Adiciona a GPG Key do Repositorio PHP 7.4
+      get_url:
+        url: 'https://packages.sury.org/php/apt.gpg'
+        dest: '/etc/apt/trusted.gpg.d/php.gpg'
 
-- name: Instala PHP 7.4 e os modulos
-  apt:
-    name: "{{ nc_packages }}"
+    - name: Adiciona repositorio do PHP 7.4
+      apt_repository:
+        repo: deb https://packages.sury.org/php/ {{ debian_version }} main
+        state: present
+        filename: php
+        update_cache: true
+      tags: repo
+
+    - name: Instala PHP 7.4 e os modulos
+      apt:
+        name: "{{ nc_packages }}"
+
+- name: Valida se o arquivo nextcloud-{{ nextcloud_versionstring }}.zip existe
+  stat:
+    path: '/root/nextcloud-{{ nextcloud_versionstring }}.zip'
+  register: nexcloud_zip
 
 - name: Download nextcloud
   get_url:
     url: 'https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_versionstring }}.zip'
     dest: '/root/nextcloud-{{ nextcloud_versionstring }}.zip'
+  when: not nexcloud_zip.stat.exists
 
 - name: Extrai nextcloud-{{ nextcloud_versionstring }}.zip Para /var/www/nextcloud
   unarchive:
     src: '/root/nextcloud-{{ nextcloud_versionstring }}.zip'
     dest: /var/www/
     remote_src: true
+  when: not nexcloud_zip.stat.exists
 
 - name: Define as permissões do diretorio do nextcloud
   file:
     path: "{{ work_dir }}"
     owner: www-data
     group: www-data
-    mode: '0655'
-
-- name: Instala nextcloud
-  shell: |
-    php occ maintenance:install \
-    --database={{ db_type }} \
-    --databese-name={{ db_name }} \
-    --database-host={{ db_hostname }} \
-    --database-user={{ db_username }} \
-    --database-pass={{ db_password }} \
-    --data-dir={{ data_dir }}
-  args:
-    chdir: /var/www/nextcloud/
-  become_user: www-data
-  become: true
+    mode: '0755'
+    recurse: true
 
 - name: define configuração do apache2
   template:
     src: apache.j2
-    dest: '/etc/apache2/sites-available/{{ domain }}.conf'
+    dest: '/etc/apache2/sites-available/000-nextcloud.conf'
     owner: root
     group: root
     mode: '0644'
 
+- name: Valida se o arquivo 000-nextcloud.conf existe
+  stat:
+    path: /etc/apache2/sites-available/000-nextcloud.conf
+  register: apache_conf
+
 - name: ativa o site
-  command: /usr/sbin/a2ensite "{{ domain }}".conf
+  command: /usr/sbin/a2ensite 000-nextcloud.conf
   args:
     chdir: /etc/apache2/sites-available/
+  when: apache_conf.stat.exists
+
+- name: Valida se o arquivo 000-default.conf existe
+  stat:
+    path: /etc/apache2/sites-enabled/000-default.conf
+  register: default_apache
+
+- name: Desabilita o site Padrão
+  command: /usr/sbin/a2dissite 000-default.conf
+  args:
+    chdir: /etc/apache2/sites-enabled/
+  when: default_apache.stat.exists
 
 - name: Inicia o Serviço do apache
   service:
     name: apache2
     state: started
     enabled: true
+
+- name: Valida se o arquivo config.php existe
+  stat:
+    path: "{{ nextcloud_config_file }}"
+  register: nextcloud_install
+
+- name: Instala nextcloud
+  shell: |
+    sudo -u www-data php7.4 occ maintenance:install \
+    --database {{ db_type }} \
+    --database-name {{ db_name }} \
+    --database-host {{ db_hostname }} \
+    --database-user {{ db_username }} \
+    --database-pass {{ db_password }} \
+    --admin-user {{ nextcloud_admin_user }} \
+    --admin-pass {{ nextcloud_admin_pass }} \
+    --data-dir {{ data_dir }}
+  args:
+    chdir: "{{ work_dir }}"
+  # become_user: www-data
+  tags: install-nextcloud
+  when: not nextcloud_install.stat.exists
+
+- name: Adiciona o dominio {{ domain }} na configuração do {{ nextcloud_config_file }}
+  lineinfile:
+    path: "{{ nextcloud_config_file }}"
+    regexp: "localhost"
+    line: "  'overwrite.cli.url' => 'http://{{ domain }}',"
+  tags: config-nextcloud-domain
+
+- name: Edita o arquivo de configuração do nextcloud
+  lineinfile:
+    path: "{{ nextcloud_config_file }}"
+    regexp: "localhost"
+    line: "    0 => '{{ domain }}',"
+  tags: config-nextcloud-domain2
+
+- name: Reinicia o Serviço do apache2
+  service:
+    name: apache2
+    state: restarted
+
+- name: Comando pra validar o status do Nextcloud
+  command: sudo -u www-data php7.4 occ status
+  args:
+    chdir: "{{ work_dir }}"
+  register: nextcloud_status
+  when: work_dir is defined
+
+- name: Status do Nextcloud
+  debug:
+    var: nextcloud_status.stdout_lines

@@ -1,7 +1,0 @@
----
-# Do galaxy
-# - src: "community.mysql"
-#   version: "2.1.0"
-
-- src: "community.general"
-  version: "3.3.1"

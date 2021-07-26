@@ -17,6 +17,7 @@ admin_packages:
   - sudo
   - tree
   - zip
+  - python-apt
 
 nc_packages:
   - php7.4
@@ -27,10 +28,13 @@ nc_packages:
   - php7.4-curl
   - php7.4-mbstring
   - php7.4-intl
+  - php7.4-gmp
+  - php7.4-bcmath
+  - php-imagick
+  - php7.4-xml
+  - php7.4-zip
 
 db_packages: mariadb-server
-
-# pip_packages:
 
 debian_version: buster
 
@@ -38,18 +42,22 @@ nextcloud_version: 21.0.3.1
 
 nextcloud_versionstring: 21.0.3
 
-domain: nc.ollemg.me
+domain: nc.ollemg.br
+
+# Configurações do Nextcloud
+nextcloud_admin_user: ollemg
+nextcloud_admin_pass: ollemg
+nextcloud_config_file: /var/www/nextcloud/config/config.php
+data_dir: /var/www/nextcloud/data
+work_dir: /var/www/nextcloud/
 
 # configurações do banco de dados
 db_username: nextcloud
 db_password: nextcloud
 db_name: nextcloud
-db_hostname: ncdb01.ollemg.me
+db_hostname: db.ollemg.br
 db_type: mysql
 db_installed: false
-
-data_dir: /var/www/nextcloud/data
-work_dir: /var/www/nextcloud/
 
 # MariaDB config
 mariadb_config_bind: 0.0.0.0
