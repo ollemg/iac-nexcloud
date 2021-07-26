@@ -1,9 +1,15 @@
 # ANSIBLE CONF
 <VirtualHost *:80>
-  DocumentRoot /var/www/nextcloud/
   ServerName  {{ domain }}
+  Redirect / https://{{ domain }}/
 
-  <Directory /var/www/nextcloud/>
+</VirtualHost>
+<VirtualHost *:443>
+
+  ServerName{{ domain }}
+  DocumentRoot {{ work_dir }}
+
+  <Directory {{ work_dir }}>
     Require all granted
     AllowOverride All
     Options FollowSymLinks MultiViews
@@ -13,4 +19,8 @@
     </IfModule>
 
   </Directory>
+
+   SSLEngine on
+   SSLCertificateFile {{ ssl_dir }}{{ ssl_crt }}
+   SSLCertificateKeyFile {{ ssl_dir }}{{ ssl_dir }}
 </VirtualHost>
