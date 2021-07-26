@@ -49,13 +49,16 @@ nextcloud_admin_user: ollemg
 nextcloud_admin_pass: ollemg
 nextcloud_config_file: /var/www/nextcloud/config/config.php
 data_dir: /var/www/nextcloud/data
-work_dir: /var/www/nextcloud/
+work_dir: /var/www/nextcloud
+ssl_dir: /etc/apache2/ssl/
+ssl_key: ollemg.br.key
+ssl_crt: ollemg.br.crt
 
 # configurações do banco de dados
 db_username: nextcloud
 db_password: nextcloud
 db_name: nextcloud
-db_hostname: db.ollemg.br
+db_hostname: nc-db01.ollemg.br
 db_type: mysql
 db_installed: false
 
@@ -66,3 +69,7 @@ mariadb_config_collation: utf8mb4_general_ci
 mariadb_config_transaction_isolation: READ-COMMITTED
 mariadb_config_binlog_format: ROW
 mariadb_config_innodb_buffer_pool_size: 1GB
+
+
+# Ansible Playbook config
+role_web_dir: /home/github/iac-nexcloud/config_nc_web/files/
