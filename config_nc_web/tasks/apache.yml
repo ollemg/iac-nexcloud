@@ -1,0 +1,47 @@
+---
+- name: configuração do apache2
+  block:
+
+    - name: Template do apache para o {{ domain }}
+      template:
+        src: apache.j2
+        dest: '/etc/apache2/sites-available/000-nextcloud.conf'
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Valida se o arquivo 000-nextcloud.conf existe
+      stat:
+        path: /etc/apache2/sites-available/000-nextcloud.conf
+      register: apache_conf
+
+    - name: ativa o site
+      command: /usr/sbin/a2ensite 000-nextcloud.conf
+      args:
+        chdir: /etc/apache2/sites-available/
+      when: apache_conf.stat.exists
+
+    - name: Ativa o modulo ssl rewrite
+      command: /usr/sbin/a2enmod ssl rewrite
+      when: apache_conf.stat.exists
+
+    - name: Copia o certificado SSL
+      copy:
+        src: "{{ role_web_dir }}ssl/"
+        dest: /etc/apache2/ssl/
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Valida se o arquivo 000-default.conf existe
+      stat:
+        path: /etc/apache2/sites-enabled/000-default.conf
+      register: default_apache
+
+    - name: Desabilita o site Padrão
+      command: /usr/sbin/a2dissite 000-default.conf
+      args:
+        chdir: /etc/apache2/sites-enabled/
+      when: default_apache.stat.exists
+
+  tags: apache_block_config
