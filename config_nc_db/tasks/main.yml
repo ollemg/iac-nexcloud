@@ -7,11 +7,6 @@
   apt:
     name: "{{ db_packages }}"
 
-- name: Remove arquivo my.cnf que vem por padrao
-  community.general.archive:
-    path: /etc/mysql/my.cnf
-    remove: true
-
 - name: Arquivo de configuração do Mysql
   template:
     src: mysql.j2
@@ -20,14 +15,10 @@
     group: root
     mode: '0644'
 
-- name: Reinicia o Serviço do MySQL
-  service:
-    name: mysql
-    state: restarted
-
 - name: Ativa o Serviço do MySQL
   service:
     name: mysql
+    state: started
     enabled: true
 
 - name: Consulta Usuario {{ db_username }}

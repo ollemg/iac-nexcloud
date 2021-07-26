@@ -7,6 +7,7 @@ venv:
 
 config:
 	export ANSIBLE_CONFIG=$(PWD)/ansible.cfg
+	ansible --version
 
 install:
 	pip install --upgrade pip
