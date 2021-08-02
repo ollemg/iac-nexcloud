@@ -3,46 +3,5 @@
   apt:
     name: "{{ admin_packages }}"
 
-- name: Instala MariaDB Server
-  apt:
-    name: "{{ db_packages }}"
-
-- name: Arquivo de configuração do Mysql
-  template:
-    src: mysql.j2
-    dest: /etc/mysql/my.cnf
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Ativa o Serviço do MySQL
-  service:
-    name: mysql
-    state: started
-    enabled: true
-
-- name: Consulta Usuario {{ db_username }}
-  command: mysql -e "SELECT user FROM mysql.user WHERE user = '{{ db_username }}';"
-  register: view_db_username
-  when: db_username is defined
-
-- name: Consulta Base {{ db_name }}
-  command: mysql -e "SHOW DATABASES;"
-  register: view_db_name
-  when: db_name is defined
-
-- name: Cria o usuario {{ db_username }}
-  command: mysql -e "CREATE USER '{{ db_username }}'@'%' IDENTIFIED BY '{{ db_password }}';"
-  when: view_db_username.stdout.find('{{ db_username }}') == -1
-
-- name: Cria a database {{ db_name }}
-  command: mysql -e "CREATE DATABASE {{ db_name }};"
-  when: view_db_username.stdout.find('{{ db_name }}') == -1
-
-- name: Concede as permissões do usuário
-  command: mysql -e "GRANT ALL PRIVILEGES on nextcloud.* to '{{ db_username }}'@'%';"
-  when: db_name is defined
-
-- name: FLUSH PRIVILEGES
-  command: mysql -e "FLUSH PRIVILEGES;"
-  when: db_name is defined
+- name: Importa a task de configuração do php
+  import_tasks: mysql.yml
