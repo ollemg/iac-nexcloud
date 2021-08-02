@@ -18,26 +18,28 @@ admin_packages:
   - tree
   - zip
   - python-apt
+  - debsecan
+
+php_version: 7.4
 
 nc_packages:
   - apache2
   - libapache2-mod-php7.4
-  - php7.4
-  - php7.4-gd
-  - php7.4-mysql
-  - php7.4-curl
-  - php7.4-mbstring
-  - php7.4-intl
-  - php7.4-gmp
-  - php7.4-bcmath
-  - php7.4-imagick
-  - php7.4-xml
-  - php7.4-zip
-  - php7.4-apcu
+  - php{{ php_version }}
+  - php{{ php_version }}-gd
+  - php{{ php_version }}-mysql
+  - php{{ php_version }}-curl
+  - php{{ php_version }}-mbstring
+  - php{{ php_version }}-intl
+  - php{{ php_version }}-gmp
+  - php{{ php_version }}-bcmath
+  - php{{ php_version }}-imagick
+  - php{{ php_version }}-xml
+  - php{{ php_version }}-zip
+  - php{{ php_version }}-apcu
   - libmagickcore-dev
 
-db_packages:
-  - mariadb-server
+db_packages: mariadb-server
 
 debian_version: buster
 
@@ -48,8 +50,8 @@ nextcloud_versionstring: 21.0.3
 domain: nc.ollemg.br
 
 # Configurações do Nextcloud
-nextcloud_admin_user: ollemg
-nextcloud_admin_pass: ollemg
+nextcloud_admin_user: admin1
+nextcloud_admin_pass: admin1
 nextcloud_config_file: /var/www/nextcloud/config/config.php
 nextcloud_config_dir: /var/www/nextcloud/config
 data_dir: /mnt/nextcloud/data/
@@ -77,3 +79,10 @@ mariadb_config_innodb_buffer_pool_size: 1GB
 
 # Ansible Playbook config
 role_web_dir: /home/github/iac-nexcloud/config_nc_web/files/
+
+# apache config
+
+apache_modules: 
+  - ssl 
+  - rewrite
+  - headers

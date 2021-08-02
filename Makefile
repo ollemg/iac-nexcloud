@@ -14,6 +14,6 @@ install:
 	pip install -r requirements.txt
 
 run:
-	ansible-playbook playbook.yml
+	ansible-playbook playbook.yaml
 
 

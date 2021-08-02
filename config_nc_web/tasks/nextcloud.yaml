@@ -41,13 +41,14 @@
         path: "{{ nextcloud_config_file }}"
       register: nextcloud_install
 
-    - name: Template do arquivo autoconfig.php
+    - name: copia nextcloud.j2 para /root/nextcloud.sh para subistituir os parametros trusted_domains e overwrite.cli.url
       template:
-        src: autoconfig.j2
-        dest: "{{ nextcloud_config_dir }}/custom.config.php"
-        owner: www-data
-        group: www-data
-        mode: '0770'
+        src: nextcloud.j2
+        dest: "/root/nextcloud.sh"
+        owner: root
+        group: root
+        mode: '0777'
+
 
     - name: Instala nextcloud
       shell: |
@@ -65,27 +66,9 @@
       when: not nextcloud_install.stat.exists
       tags: install-nextcloud
 
-    # - name: Adiciona o dominio {{ domain }} na configuração do {{ nextcloud_config_file }}
-    #   lineinfile:
-    #     path: "{{ nextcloud_config_file }}"
-    #     regexp: "localhost"
-    #     line: "  'overwrite.cli.url' => 'http://{{ domain }}',"
-    #   tags: config-nextcloud-domain
-
-    # - name: Edita o arquivo de configuração do nextcloud
-    #   lineinfile:
-    #     path: "{{ nextcloud_config_file }}"
-    #     regexp: "localhost"
-    #     line: "    0 => '{{ domain }}',"
-    #   tags: config-nextcloud-trusted-domain
-
-    - name: Template do arquivo .htaccess
-      template:
-        src: htaccess.j2
-        dest: "{{ work_dir }}/.htaccess"
-        owner: www-data
-        group: www-data
-        mode: '0774'
+    - name: Executa script nextcloud.sh
+      shell: /root/nextcloud.sh
+      when: nextcloud_install.stat.exists
 
     - name: Reinicia o Serviço do apache2
       service:
