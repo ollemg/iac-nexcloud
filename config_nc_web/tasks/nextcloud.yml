@@ -25,13 +25,29 @@
         path: "{{ work_dir }}"
         owner: www-data
         group: www-data
-        mode: '0755'
+        mode: '0770'
+        recurse: true
+
+    - name: Define as permissões do diretorio de arquivos
+      file:
+        path: "{{ data_dir }}"
+        owner: www-data
+        group: www-data
+        mode: '0770'
         recurse: true
 
     - name: Valida se o arquivo config.php existe
       stat:
         path: "{{ nextcloud_config_file }}"
       register: nextcloud_install
+
+    - name: Template do arquivo autoconfig.php
+      template:
+        src: autoconfig.j2
+        dest: "{{ nextcloud_config_dir }}/custom.config.php"
+        owner: www-data
+        group: www-data
+        mode: '0770'
 
     - name: Instala nextcloud
       shell: |
@@ -46,31 +62,30 @@
         --data-dir {{ data_dir }}
       args:
         chdir: "{{ work_dir }}"
-      become_user: root
       when: not nextcloud_install.stat.exists
       tags: install-nextcloud
 
-    - name: Adiciona o dominio {{ domain }} na configuração do {{ nextcloud_config_file }}
-      lineinfile:
-        path: "{{ nextcloud_config_file }}"
-        regexp: "localhost"
-        line: "  'overwrite.cli.url' => 'http://{{ domain }}',"
-      tags: config-nextcloud-domain
+    # - name: Adiciona o dominio {{ domain }} na configuração do {{ nextcloud_config_file }}
+    #   lineinfile:
+    #     path: "{{ nextcloud_config_file }}"
+    #     regexp: "localhost"
+    #     line: "  'overwrite.cli.url' => 'http://{{ domain }}',"
+    #   tags: config-nextcloud-domain
 
-    - name: Edita o arquivo de configuração do nextcloud
-      lineinfile:
-        path: "{{ nextcloud_config_file }}"
-        regexp: "localhost"
-        line: "    0 => '{{ domain }}',"
-      tags: config-nextcloud-domain2
+    # - name: Edita o arquivo de configuração do nextcloud
+    #   lineinfile:
+    #     path: "{{ nextcloud_config_file }}"
+    #     regexp: "localhost"
+    #     line: "    0 => '{{ domain }}',"
+    #   tags: config-nextcloud-trusted-domain
 
     - name: Template do arquivo .htaccess
       template:
         src: htaccess.j2
-        dest: "{{ work_dir }}"
+        dest: "{{ work_dir }}/.htaccess"
         owner: www-data
         group: www-data
-        mode: '0744'
+        mode: '0774'
 
     - name: Reinicia o Serviço do apache2
       service:
@@ -88,3 +103,5 @@
     - name: Status do Nextcloud
       debug:
         var: nextcloud_status.stdout_lines
+
+  tags: nextcloud_block_config

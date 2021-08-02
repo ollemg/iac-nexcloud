@@ -19,9 +19,9 @@
     </IfModule>
   </Directory>
     
-    <IfModule mod_headers.c>
+  <IfModule mod_headers.c>
       Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
-    </IfModule>
+  </IfModule>
 
    SSLEngine on
    SSLCertificateFile {{ ssl_dir }}{{ ssl_crt }}
