@@ -20,9 +20,9 @@ admin_packages:
   - python-apt
 
 nc_packages:
-  - php7.4
   - apache2
   - libapache2-mod-php7.4
+  - php7.4
   - php7.4-gd
   - php7.4-mysql
   - php7.4-curl
@@ -33,9 +33,8 @@ nc_packages:
   - php7.4-imagick
   - php7.4-xml
   - php7.4-zip
-  - php7.4-memcached
   - php7.4-apcu
-  - memcached
+  - libmagickcore-dev
 
 db_packages:
   - mariadb-server
@@ -52,7 +51,8 @@ domain: nc.ollemg.br
 nextcloud_admin_user: ollemg
 nextcloud_admin_pass: ollemg
 nextcloud_config_file: /var/www/nextcloud/config/config.php
-data_dir: /var/www/nextcloud/data
+nextcloud_config_dir: /var/www/nextcloud/config
+data_dir: /mnt/nextcloud/data/
 work_dir: /var/www/nextcloud
 ssl_dir: /etc/apache2/ssl/
 ssl_key: ollemg.br.key
