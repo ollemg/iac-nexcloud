@@ -78,7 +78,7 @@ mariadb_config_innodb_buffer_pool_size: 1GB
 
 
 # Ansible Playbook config
-role_web_dir: /home/github/iac-nexcloud/config_nc_web/files/
+role_web_dir: ./config_nc_web/files/
 
 # apache config
 

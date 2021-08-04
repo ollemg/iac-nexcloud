@@ -68,7 +68,6 @@
 
     - name: Executa script nextcloud.sh
       shell: /root/nextcloud.sh
-      when: nextcloud_install.stat.exists
 
     - name: Reinicia o Serviço do apache2
       service:
