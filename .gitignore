@@ -1,2 +1,7 @@
 .venv
 .vscode
+*.code-workspace
+*.crt
+*.key
+/config_nc_web/vars/*
+/config_nc_db/vars/*

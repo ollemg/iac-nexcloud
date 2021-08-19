@@ -1,0 +1,18 @@
+---
+- name: Instala Redis Server
+  apt:
+    name: "{{ db_packages }}"
+
+- name: Arquivo de configuração do Redis
+  template:
+    src: redis.j2
+    dest: /etc/redis/redis.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ativa o Serviço do Redis
+  service:
+    name: redis-server
+    state: restarted
+    enabled: true

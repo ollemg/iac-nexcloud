@@ -1,13 +1,13 @@
 ---
-- name: Instalação e configuração do PHP 7.4
+- name: Instalação e configuração do PHP {{ php_version }}
   block:
 
-    - name: Adiciona a GPG Key do Repositorio PHP 7.4
+    - name: Adiciona a GPG Key do Repositorio PHP {{ php_version }}
       get_url:
         url: 'https://packages.sury.org/php/apt.gpg'
         dest: '/etc/apt/trusted.gpg.d/php.gpg'
 
-    - name: Adiciona repositorio do PHP 7.4
+    - name: Adiciona repositorio do PHP "{{ php_version }}"
       apt_repository:
         repo: deb https://packages.sury.org/php/ {{ debian_version }} main
         state: present
@@ -15,6 +15,6 @@
         update_cache: true
       tags: repo
 
-    - name: Instala PHP 7.4 e os modulos
+    - name: Instala PHP "{{ php_version }}" e os modulos
       apt:
         name: "{{ nc_packages }}"

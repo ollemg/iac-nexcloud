@@ -29,11 +29,11 @@
 
 - name: Cria o usuario {{ db_username }}
   command: mysql -e "CREATE USER '{{ db_username }}'@'%' IDENTIFIED BY '{{ db_password }}';"
-  when: view_db_username.stdout.find('{{ db_username }}') == -1
+  when: view_db_username.stdout.find(db_username) == -1
 
 - name: Cria a database {{ db_name }}
   command: mysql -e "CREATE DATABASE {{ db_name }};"
-  when: view_db_username.stdout.find('{{ db_name }}') == -1
+  when: view_db_username.stdout.find(db_name) == -1
 
 - name: Concede as permissões do usuário
   command: mysql -e "GRANT ALL PRIVILEGES on nextcloud.* to '{{ db_username }}'@'%';"

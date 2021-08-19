@@ -13,7 +13,7 @@
         dest: '/root/nextcloud-{{ nextcloud_versionstring }}.zip'
       when: not nexcloud_zip.stat.exists
 
-    - name: Extrai nextcloud-{{ nextcloud_versionstring }}.zip Para /var/www/nextcloud
+    - name: Extrai nextcloud-{{ nextcloud_versionstring }}.zip Para {{ work_dir }}
       unarchive:
         src: '/root/nextcloud-{{ nextcloud_versionstring }}.zip'
         dest: /var/www/
@@ -23,16 +23,16 @@
     - name: Define as permissões do diretorio do nextcloud
       file:
         path: "{{ work_dir }}"
-        owner: www-data
-        group: www-data
+        owner: "{{ web_user }}"
+        group: "{{ web_user }}"
         mode: '0770'
         recurse: true
 
     - name: Define as permissões do diretorio de arquivos
       file:
         path: "{{ data_dir }}"
-        owner: www-data
-        group: www-data
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
         mode: '0770'
         recurse: true
 
@@ -41,18 +41,53 @@
         path: "{{ nextcloud_config_file }}"
       register: nextcloud_install
 
-    - name: copia nextcloud.j2 para /root/nextcloud.sh para subistituir os parametros trusted_domains e overwrite.cli.url
-      template:
-        src: nextcloud.j2
-        dest: "/root/nextcloud.sh"
-        owner: root
-        group: root
-        mode: '0777'
+    - name: Configurações personalizadas do nextcloud
+      block:
 
+        - name: Copia web.config.j2 para {{ nextcloud_config_dir}}
+          template:
+            src: web.config.php.j2
+            dest: "{{ nextcloud_config_dir}}/web.config.php"
+            owner: "{{ web_user }}"
+            group: "{{ web_group }}"
+            mode: '0770'
+        
+        - name: Copia log.config.j2 para {{ nextcloud_config_dir}}
+          template:
+            src: log.config.php.j2
+            dest: "{{ nextcloud_config_dir}}/log.config.php"
+            owner: "{{ web_user }}"
+            group: "{{ web_group }}"
+            mode: '0770'
+
+        - name: Copia redis.config.j2 para {{ nextcloud_config_dir}}
+          template:
+            src: redis.config.php.j2
+            dest: "{{ nextcloud_config_dir}}/redis.config.php"
+            owner: "{{ web_user }}"
+            group: "{{ web_group }}"
+            mode: '0770'
+
+        - name: Copia user.config.j2 para "{{ nextcloud_config_dir}}"
+          template:
+            src: user.config.php.j2
+            dest: "{{ nextcloud_config_dir}}/user.config.php"
+            owner: "{{ web_user }}"
+            group: "{{ web_group }}"
+            mode: '0770'
+
+        - name: Copia proxy.config.j2 para "{{ nextcloud_config_dir}}"
+          template:
+            src: proxy.config.php.j2
+            dest: "{{ nextcloud_config_dir}}/proxy.config.php"
+            owner: "{{ web_user }}"
+            group: "{{ web_group }}"
+            mode: '0770'
+          when: trusted_proxies is defined
 
     - name: Instala nextcloud
       shell: |
-        sudo -u www-data php7.4 occ maintenance:install \
+        sudo -u www-data php{{ php_version }} occ maintenance:install \
         --database {{ db_type }} \
         --database-name {{ db_name }} \
         --database-host {{ db_hostname }} \
@@ -66,13 +101,10 @@
       when: not nextcloud_install.stat.exists
       tags: install-nextcloud
 
-    - name: Executa script nextcloud.sh
-      shell: /root/nextcloud.sh
-
     - name: Reinicia o Serviço do apache2
       service:
         name: apache2
-        state: started
+        state: restarted
         enabled: true
 
     - name: Comando pra validar o status do Nextcloud
@@ -81,6 +113,12 @@
         chdir: "{{ work_dir }}"
       register: nextcloud_status
       when: work_dir is defined
+
+    - name: Atualiza .htaccess
+      command: sudo -u www-data php{{ php_version }} occ maintenance:update:htaccess
+      args:
+        chdir: "{{ work_dir }}"
+      when: nextcloud_install.stat.exists
 
     - name: Status do Nextcloud
       debug:

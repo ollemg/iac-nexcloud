@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# ANSIBLE CONFIG
-
-# Troca a URL do Nextcloud confirme variaveis setadas no arquivo group_vars/all.yaml
-
-current_server=$(egrep http* {{ nextcloud_config_file }} | cut -d / -f 3 | cut -d "'" -f 1)
-sed -i "s;localhost;{{ domain }};g" {{ nextcloud_config_file }}
-#

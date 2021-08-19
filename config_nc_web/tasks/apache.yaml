@@ -4,7 +4,7 @@
 
     - name: Template do apache para o {{ domain }}
       template:
-        src: apache.j2
+        src: 000-nextcloud.conf.j2
         dest: '/etc/apache2/sites-available/000-nextcloud.conf'
         owner: root
         group: root
@@ -27,7 +27,7 @@
 
     - name: Copia o certificado SSL
       copy:
-        src: "{{ role_web_dir }}ssl/"
+        src: "{{ role_web_dir }}/ssl/"
         dest: /etc/apache2/ssl/
         owner: root
         group: root

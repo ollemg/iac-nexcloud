@@ -19,6 +19,8 @@ admin_packages:
   - zip
   - python-apt
   - debsecan
+  - cifs-utils
+  - redis-tools
 
 php_version: 7.4
 
@@ -35,17 +37,23 @@ nc_packages:
   - php{{ php_version }}-bcmath
   - php{{ php_version }}-imagick
   - php{{ php_version }}-xml
+  - php{{ php_version }}-ldap
   - php{{ php_version }}-zip
   - php{{ php_version }}-apcu
+  - php{{ php_version }}-redis
+  - php{{ php_version }}-bz2
+  - php{{ php_version }}-smbclient
   - libmagickcore-dev
 
-db_packages: mariadb-server
+db_packages: 
+  - mariadb-server
+  - redis-server
 
 debian_version: buster
 
-nextcloud_version: 21.0.3.1
-
 nextcloud_versionstring: 21.0.3
+
+nextcloud_version: "{{ nextcloud_versionstring}}.1"
 
 domain: nc.ollemg.br
 
@@ -54,17 +62,19 @@ nextcloud_admin_user: admin1
 nextcloud_admin_pass: admin1
 nextcloud_config_file: /var/www/nextcloud/config/config.php
 nextcloud_config_dir: /var/www/nextcloud/config
-data_dir: /mnt/nextcloud/data/
+data_dir: /mnt/nextcloud/data
 work_dir: /var/www/nextcloud
-ssl_dir: /etc/apache2/ssl/
+ssl_dir: /etc/apache2/ssl
 ssl_key: ollemg.br.key
 ssl_crt: ollemg.br.crt
+web_user: www-data
+web_group: "{{ web_user }}"
 
 # configurações do banco de dados
 db_username: nextcloud
 db_password: nextcloud
 db_name: nextcloud
-db_hostname: nc-db01.ollemg.br
+db_hostname: fox.ollemg.br
 db_type: mysql
 db_installed: false
 
@@ -76,6 +86,10 @@ mariadb_config_transaction_isolation: READ-COMMITTED
 mariadb_config_binlog_format: ROW
 mariadb_config_innodb_buffer_pool_size: 1GB
 
+# Redis Config
+
+redis_port: 6379
+redis_bind: 0.0.0.0
 
 # Ansible Playbook config
 role_web_dir: ./config_nc_web/files/
