@@ -19,7 +19,7 @@ venv:
 
 .PHONY: config
 config:
-	@export ANSIBLE_CONFIG=$(PWD)/ansible.cfg
+	@export ANSIBLE_CONFIG=$(pwd)/ansible.cfg
 
 .PHONY: install
 install:	## upgrade pip and install requirements in ./requirements.txt
@@ -32,7 +32,7 @@ run:		## run playbook
 
 .PHONY: ssl
 ssl:		## Create SSL certificate in ./config_nc_web/files/ssl/
-	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(PWD)/config_nc_web/files/ssl/ollemg.br.key -out $(PWD)/config_nc_web/files/ssl/ollemg.br.crt
+	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $(pwd)/config_nc_web/files/ssl/ollemg.br.key -out $(pwd)/config_nc_web/files/ssl/ollemg.br.crt
 
 .PHONY: lint
 lint:		## lint playbook

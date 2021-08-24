@@ -5,3 +5,5 @@
 *.key
 /config_nc_web/vars/*
 /config_nc_db/vars/*
+ansible.cfg
+
