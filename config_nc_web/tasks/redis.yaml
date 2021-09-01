@@ -1,8 +1,4 @@
 ---
-- name: Instala Redis Server
-  apt:
-    name: "{{ db_packages }}"
-
 - name: Arquivo de configuração do Redis
   template:
     src: redis.j2

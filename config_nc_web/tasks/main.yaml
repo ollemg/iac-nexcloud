@@ -9,5 +9,9 @@
 - name: Importa a task de configuração do apache2
   import_tasks: apache.yaml
 
+- name: Importa a task de configuração do redis
+  import_tasks: redis.yaml
+
 - name: Importa a task de configuração do nextcloud
   import_tasks: nextcloud.yaml
+

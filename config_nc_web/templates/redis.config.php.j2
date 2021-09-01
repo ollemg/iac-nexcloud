@@ -2,8 +2,9 @@
 $CONFIG = array(
   'memcache.local' => '\OC\Memcache\Redis',
   'memcache.distributed' => '\OC\Memcache\Redis',
+  'memcache.locking' => '\OC\Memcache\Redis',
   'redis' => [
-  	'host' => '{{ db_hostname }}',
+  	'host' => '127.0.0.1',
   	'port' => {{ redis_port }},
 ],
 );

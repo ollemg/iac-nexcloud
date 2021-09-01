@@ -43,11 +43,13 @@ nc_packages:
   - php{{ php_version }}-redis
   - php{{ php_version }}-bz2
   - php{{ php_version }}-smbclient
+  - php{{ php_version }}-ftp
+  - php{{ php_version }}-fpm
+  - libapache2-mod-fcgid
   - libmagickcore-dev
-
-db_packages: 
-  - mariadb-server
   - redis-server
+
+db_packages: mariadb-server
 
 debian_version: buster
 

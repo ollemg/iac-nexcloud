@@ -10,6 +10,22 @@
         group: root
         mode: '0644'
 
+    - name: Template do php-fpm 
+      template:
+        src: www.conf.j2
+        dest: '/etc/php/{{ php_version }}/fpm/pool.d/www.conf'
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Template php.ini
+      template:
+        src: php.ini.j2
+        dest: '/etc/php/{{ php_version }}/fpm/php.ini'
+        owner: root
+        group: root
+        mode: '0644'
+
     - name: Valida se o arquivo 000-nextcloud.conf existe
       stat:
         path: /etc/apache2/sites-available/000-nextcloud.conf
@@ -21,8 +37,16 @@
         chdir: /etc/apache2/sites-available/
       when: apache_conf.stat.exists
 
+    - name: Desativa o modulo php{{ php_version }} mpm_prefork
+      command: /usr/sbin/a2dismod php{{ php_version }} mpm_prefork
+      when: apache_conf.stat.exists
+
+    - name: Ativa a configuração php{{ php_version }}-fpm
+      command: /usr/sbin/a2enconf php{{ php_version }}-fpm
+      when: apache_conf.stat.exists
+
     - name: Ativa o modulo {{ apache_modules }}
-      command: /usr/sbin/a2enmod ssl rewrite headers
+      command: /usr/sbin/a2enmod ssl rewrite headers mpm_event proxy proxy_fcgi setenvif mime dir env headers
       when: apache_conf.stat.exists
 
     - name: Copia o certificado SSL
@@ -43,5 +67,15 @@
       args:
         chdir: /etc/apache2/sites-enabled/
       when: default_apache.stat.exists
+
+    - name: Reinicia o serviço do Apache2 e php{{ php_version }}-fpm
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Reinicia o serviço php{{ php_version }}-fpm
+      service:
+        name: php{{ php_version }}-fpm
+        state: restarted
 
   tags: apache_block_config
