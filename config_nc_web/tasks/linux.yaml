@@ -1,0 +1,23 @@
+---
+- name: Taks de montagem do storage externo
+  block:
+
+  - name: Copia smbsecret.j2 para {{ cifs_secret }}
+    template:
+      src: cifssecret.j2
+      dest: "{{ cifs_secret }}"
+      owner: root
+      group: root
+      mode: '0770'
+  
+  - name: Monta storage CIFS
+    mount:
+      src: //{{ storage}}/{{ share }}
+      path: "{{ mount_path }}"
+      opts: "{{ mount_options }}"
+      boot: yes
+      state: mounted
+      fstype: cifs
+  
+  tags: mount_storage
+

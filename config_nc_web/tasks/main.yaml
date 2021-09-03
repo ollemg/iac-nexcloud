@@ -3,6 +3,10 @@
   apt:
     name: "{{ admin_packages }}"
 
+- name: Importa a task de configuração do Storage
+  import_tasks: linux.yaml
+  when: mount_enable == True
+
 - name: Importa a task de configuração do PHP
   import_tasks: php.yaml
 

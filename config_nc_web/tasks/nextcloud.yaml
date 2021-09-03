@@ -35,6 +35,7 @@
         group: "{{ web_group }}"
         mode: '0770'
         recurse: true
+      when: mount_enable == False
 
     - name: Valida se o arquivo config.php existe
       stat:
