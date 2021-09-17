@@ -59,10 +59,10 @@ Mudar o IP do servidor em hosts.ini
 
 ~~~bash
 [web]
-172.30.3.241
+192.168.0.1
 
 [db]
-172.30.3.242
+192.168.0.2
 ~~~
 
 Executar o playbook
